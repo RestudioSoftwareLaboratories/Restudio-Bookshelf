@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restudio Bookshelf</title>
+
+    <!-- Tiny5 Pixel Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons for KeepSave -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/JzYGnt17/restudio-profile.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER BAR ─────────────────────── */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #000000;
+            padding: 12px 24px;
+        }
+
+        .header-logo {
+            height: 38px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-transform: lowercase;
+            line-height: 1;
+        }
+
+        /* Header buttons group */
+        .header-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 1px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            padding: 6px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .header-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #ffffff;
+        }
+
+        .header-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .header-btn:hover svg {
+            fill: #000000;
+        }
+
+        /* KeepSave Button in Header */
+        .keepsave-top-btn {
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Tiny5', 'Courier New', monospace;
+        }
+
+        .keepsave-top-btn:hover {
+            background: #1557b0;
+            transform: translateY(-1px);
+        }
+
+        .keepsave-top-btn .material-icons {
+            font-size: 18px;
+        }
+
+        .keepsave-badge {
+            background: #fff;
+            color: #1a73e8;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* KeepSave Overlay */
+        .keepsave-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 5000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .keepsave-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* KeepSave Drawer */
+        .keepsave-drawer {
+            position: fixed;
+            top: 0;
+            left: -450px;
+            width: 430px;
+            max-width: 90vw;
+            height: 100%;
+            background: #fff;
+            z-index: 6000;
+            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+            font-family: 'Tiny5', 'Courier New', monospace;
+        }
+        .keepsave-drawer.open {
+            left: 0;
+        }
+
+        .keepsave-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+        }
+        .keepsave-header h2 {
+            font-size: 20px;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .keepsave-header h2 .material-icons {
+            color: #1a73e8;
+            font-size: 24px;
+        }
+        .keepsave-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #5f6368;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Tabs in KeepSave */
+        .keepsave-tabs {
+            display: flex;
+            border-bottom: 1px solid #e8eaed;
+            background: #fff;
+        }
+        .keepsave-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f6368;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .keepsave-tab .material-icons {
+            font-size: 18px;
+        }
+        .keepsave-tab.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+        .keepsave-tab.like-tab.active {
+            color: #4caf50;
+            border-bottom-color: #4caf50;
+        }
+        .keepsave-tab.dislike-tab.active {
+            color: #f44336;
+            border-bottom-color: #f44336;
+        }
+        
+        .keepsave-count {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            color: #5f6368;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 1px solid #e8eaed;
+        }
+        .keepsave-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .keepsave-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: #9aa0a6;
+            text-align: center;
+        }
+        .keepsave-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 24px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .keepsave-item:hover {
+            background: #f8f9fa;
+        }
+        .keepsave-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .keepsave-item-icon.like-icon {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+        .keepsave-item-icon.dislike-icon {
+            background: #fce8e6;
+            color: #f44336;
+        }
+        .keepsave-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .keepsave-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .keepsave-item-author {
+            font-size: 12px;
+            color: #70757a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .keepsave-item-remove {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9aa0a6;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .keepsave-item-remove:hover {
+            background: #fce8e6;
+            color: #d93025;
+        }
+        .keepsave-undo {
+            font-size: 11px;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 4px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 6px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .keepsave-undo:hover {
+            background: #d2e3fc;
+        }
+        .keepsave-actions {
+            padding: 16px 24px;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            gap: 10px;
+        }
+        .keepsave-action-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .keepsave-action-btn.danger {
+            color: #d93025;
+            border-color: #d93025;
+        }
+
+        /* ── SEARCH SECTION ────────────────── */
+        .search-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 28px 20px 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 15px;
+            letter-spacing: 1px;
+            padding: 10px 16px;
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #999999;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #000000;
+        }
+
+        .search-btn {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 15px;
+            letter-spacing: 2px;
+            padding: 10px 24px;
+            background: #6473ff;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-btn:hover {
+            background: #333333;
+        }
+
+        .search-btn:active {
+            background: #000000;
+        }
+
+        .search-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #ffffff;
+            flex-shrink: 0;
+        }
+
+        /* ── RESULTS GRID ──────────────────── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 10px 24px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ── CARD ──────────────────────────── */
+        .card {
+            background: #ffffff;
+            border: none;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            overflow: hidden;
+            background: #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .card-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            color: #999999;
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .card-body {
+            padding: 14px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 0.8px;
+            color: #000000;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .card-title:hover {
+            text-decoration: underline;
+        }
+
+        .card-author {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            color: #666666;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-year {
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #999999;
+            text-transform: uppercase;
+        }
+
+        /* Card Action Buttons */
+        .card-actions {
+            display: flex;
+            gap: 6px;
+            padding: 8px 12px 14px;
+            border-top: 1px solid #eeeeee;
+            margin-top: 6px;
+        }
+
+        .card-action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 8px;
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            background: #f5f5f5;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #333333;
+        }
+
+        .card-action-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .card-action-btn.like:hover {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+
+        .card-action-btn.like.active {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+
+        .card-action-btn.dislike:hover {
+            background: #f44336;
+            border-color: #f44336;
+            color: white;
+        }
+
+        .card-action-btn.dislike.active {
+            background: #f44336;
+            border-color: #f44336;
+            color: white;
+        }
+
+        .card-action-btn.twitter-share {
+            background: #1DA1F2;
+            border-color: #1DA1F2;
+            color: white;
+        }
+
+        .card-action-btn.twitter-share:hover {
+            background: #0d8bd9;
+            border-color: #0d8bd9;
+        }
+
+        /* ── EMPTY / LOADING STATE ─────────── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999999;
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 16px;
+            letter-spacing: 2px;
+            grid-column: 1 / -1;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-state svg {
+            width: 32px;
+            height: 32px;
+            fill: #999999;
+            flex-shrink: 0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Tiny5', 'Courier New', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Disliked book hidden class */
+        .card.disliked {
+            display: none;
+        }
+
+        /* ── RESPONSIVE ────────────────────── */
+        @media (max-width: 600px) {
+            .header-bar {
+                padding: 10px 14px;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .header-buttons {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .header-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .header-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            .keepsave-top-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .keepsave-top-btn .material-icons {
+                font-size: 14px;
+            }
+            .keepsave-drawer {
+                width: 100%;
+                left: -100%;
+            }
+            .header-logo {
+                height: 28px;
+            }
+            .header-title {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+            .search-section {
+                padding: 20px 12px 14px;
+                gap: 8px;
+            }
+            .search-input {
+                font-size: 13px;
+                padding: 10px 16px;
+                max-width: 100%;
+            }
+            .search-btn {
+                font-size: 13px;
+                padding: 10px 20px;
+                letter-spacing: 1px;
+            }
+            .search-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+                padding: 8px 12px 30px;
+            }
+            .card-body {
+                padding: 10px 8px 8px;
+            }
+            .card-title {
+                font-size: 12px;
+            }
+            .card-author {
+                font-size: 10px;
+            }
+            .card-action-btn {
+                font-size: 9px;
+                padding: 5px 4px;
+            }
+            .card-action-btn svg {
+                width: 11px;
+                height: 11px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 6px 8px 24px;
+            }
+            .card-image-wrapper {
+                aspect-ratio: 3 / 4.2;
+            }
+            .card-title {
+                font-size: 11px;
+            }
+            .card-author {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════════ HEADER BAR ═══════════════ -->
+    <header class="header-bar">
+        <img
+        class="header-logo"
+        src="https://i.postimg.cc/s2j0rzBZ/swrh-restudio.png"
+        alt="Restudio Logo"
+        loading="eager"
+        onerror="this.style.display='none';"
+        >
+        <span class="header-title">bookshelf</span>
+        
+        <div class="header-buttons">
+            <button class="keepsave-top-btn" id="keepsaveOpenBtn" title="Saved Books">
+                <span class="material-icons">bookmark</span>
+                <span>KeepSave</span>
+                <span class="keepsave-badge" id="keepsaveBadge" style="display:none;">0</span>
+            </button>
+            <a class="header-btn" href="https://github.com/RestudioSoftwareLaboratories" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <polygon points="23 9 23 15 22 15 22 17 21 17 21 19 20 19 20 20 19 20 19 21 18 21 18 22 16 22 16 23 15 23 15 18 14 18 14 17 15 17 15 16 17 16 17 15 18 15 18 14 19 14 19 9 18 9 18 6 16 6 16 7 15 7 15 8 14 8 14 7 10 7 10 8 9 8 9 7 8 7 8 6 6 6 6 9 5 9 5 14 6 14 6 15 7 15 7 16 9 16 9 18 7 18 7 17 6 17 6 16 4 16 4 17 5 17 5 19 6 19 6 20 9 20 9 23 8 23 8 22 6 22 6 21 5 21 5 20 4 20 4 19 3 19 3 17 2 17 2 15 1 15 1 9 2 9 2 7 3 7 3 5 4 5 4 4 5 4 5 3 7 3 7 2 9 2 9 1 15 1 15 2 17 2 17 3 19 3 19 4 20 4 20 5 21 5 21 7 22 7 22 9 23 9"/>
+                </svg>
+                GitHub
+            </a>
+            <a class="header-btn" href="https://restudiosoftwarelaboratories.github.io/restudio/" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <polygon points="23 1 23 9 21 9 21 8 20 8 20 7 19 7 19 8 18 8 18 9 17 9 17 10 16 10 16 11 15 11 15 12 14 12 14 13 13 13 13 14 12 14 12 15 11 15 11 16 10 16 10 17 9 17 9 18 8 18 8 17 7 17 7 16 6 16 6 15 7 15 7 14 8 14 8 13 9 13 9 12 10 12 10 11 11 11 11 10 12 10 12 9 13 9 13 8 14 8 14 7 15 7 15 6 16 6 16 5 17 5 17 4 16 4 16 3 15 3 15 1 23 1"/>
+                    <polygon points="20 15 20 22 19 22 19 23 2 23 2 22 1 22 1 5 2 5 2 4 11 4 11 7 4 7 4 20 17 20 17 15 20 15"/>
+                </svg>
+                Website
+            </a>
+        </div>
+    </header>
+
+    <!-- KeepSave Drawer -->
+    <div class="keepsave-overlay" id="keepsaveOverlay"></div>
+    <div class="keepsave-drawer" id="keepsaveDrawer">
+        <div class="keepsave-header">
+            <h2><span class="material-icons">bookmark</span> Restudio KeepSave</h2>
+            <button class="keepsave-close" id="keepsaveClose">✕</button>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="keepsave-tabs">
+            <div class="keepsave-tab like-tab active" id="likeTab">
+                <span class="material-icons">thumb_up</span> Liked
+            </div>
+            <div class="keepsave-tab dislike-tab" id="dislikeTab">
+                <span class="material-icons">thumb_down</span> Disliked
+            </div>
+        </div>
+        
+        <div class="keepsave-count" id="keepsaveCount">0 liked books</div>
+        <div class="keepsave-list" id="keepsaveList">
+            <div class="keepsave-empty" id="keepsaveEmpty">
+                <span class="material-icons">bookmark_border</span>
+                <p>No liked books yet</p>
+                <p style="font-size:12px;margin-top:8px;">Click Like on any book to add it here</p>
+            </div>
+        </div>
+        <div class="keepsave-actions">
+            <button class="keepsave-action-btn" id="keepsaveExport"><span class="material-icons">file_download</span> Export</button>
+            <button class="keepsave-action-btn danger" id="keepsaveClearAll"><span class="material-icons">delete_outline</span> Clear All</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SEARCH ═══════════════════ -->
+    <div class="search-section">
+        <input
+        id="search"
+        class="search-input"
+        type="text"
+        placeholder="Search books..."
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')searchBooks();"
+        >
+        <button class="search-btn" onclick="searchBooks()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <polygon points="16 17 15 17 15 18 13 18 13 19 7 19 7 18 5 18 5 17 4 17 4 16 3 16 3 15 2 15 2 13 1 13 1 7 2 7 2 5 3 5 3 4 4 4 4 3 5 3 5 2 7 2 7 1 13 1 13 2 15 2 15 3 16 3 16 4 17 4 17 5 18 5 18 7 19 7 19 13 18 13 18 15 17 15 17 16 16 16 16 17"/>
+                <polygon points="23 20 23 22 22 22 22 23 20 23 20 22 19 22 19 21 18 21 18 20 17 20 17 19 16 19 16 18 17 18 17 17 18 17 18 16 19 16 19 17 20 17 20 18 21 18 21 19 22 19 22 20 23 20"/>
+            </svg>
+            Search
+        </button>
+    </div>
+
+    <!-- ═══════════════ RESULTS GRID ═════════════ -->
+    <div class="grid" id="results">
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <polygon points="15 20 15 22 14 22 14 23 10 23 10 22 9 22 9 20 15 20"/>
+                <path d="m21,17v-1h-1v-2h-1v-6h-1v-2h-1v-1h-1v-1h-2v-1h-1V1h-2v2h-1v1h-2v1h-1v1h-1v2h-1v6h-1v2h-1v1h-1v1h1v1h18v-1h1v-1h-1Zm-7-11v3h-1v3h-2v-3h-1v-3h4Zm-3,8h2v2h-2v-2Z"/>
+            </svg>
+            type a keyword &amp; hit search
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Action completed!</div>
+
+    <!-- ═══════════════ SCRIPT ═══════════════════ -->
+    <script>
+        // Store likes/dislikes and saved books in localStorage
+        let likedBooks = JSON.parse(localStorage.getItem('restudio_liked_books') || '{}');
+        let dislikedBooks = JSON.parse(localStorage.getItem('restudio_disliked_books') || '{}');
+        
+        // KeepSave DOM elements
+        const keepsaveOverlay = document.getElementById('keepsaveOverlay');
+        const keepsaveDrawer = document.getElementById('keepsaveDrawer');
+        const keepsaveClose = document.getElementById('keepsaveClose');
+        const keepsaveOpenBtn = document.getElementById('keepsaveOpenBtn');
+        const keepsaveList = document.getElementById('keepsaveList');
+        const keepsaveEmpty = document.getElementById('keepsaveEmpty');
+        const keepsaveCount = document.getElementById('keepsaveCount');
+        const keepsaveBadge = document.getElementById('keepsaveBadge');
+        const keepsaveExport = document.getElementById('keepsaveExport');
+        const keepsaveClearAll = document.getElementById('keepsaveClearAll');
+        
+        // Tab elements
+        const likeTab = document.getElementById('likeTab');
+        const dislikeTab = document.getElementById('dislikeTab');
+        let currentTab = 'like'; // 'like' or 'dislike'
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function updateKeepSaveUI() {
+            const likedCount = Object.keys(likedBooks).length;
+            const dislikedCount = Object.keys(dislikedBooks).length;
+            const totalCount = currentTab === 'like' ? likedCount : dislikedCount;
+            
+            keepsaveCount.textContent = currentTab === 'like' 
+                ? `${likedCount} liked book${likedCount !== 1 ? 's' : ''}`
+                : `${dislikedCount} disliked book${dislikedCount !== 1 ? 's' : ''}`;
+            
+            const badgeCount = likedCount;
+            if (badgeCount > 0) {
+                keepsaveBadge.style.display = 'flex';
+                keepsaveBadge.textContent = badgeCount;
+            } else {
+                keepsaveBadge.style.display = 'none';
+            }
+            
+            let booksList = [];
+            if (currentTab === 'like') {
+                booksList = Object.entries(likedBooks).map(([key, book]) => ({ ...book, key }));
+            } else {
+                booksList = Object.entries(dislikedBooks).map(([key, book]) => ({ ...book, key }));
+            }
+            
+            if (booksList.length > 0) {
+                keepsaveEmpty.style.display = 'none';
+                keepsaveList.innerHTML = booksList.map((book, index) => `
+                    <div class="keepsave-item" data-key="${book.key}">
+                        <div class="keepsave-item-icon ${currentTab === 'like' ? 'like-icon' : 'dislike-icon'}">
+                            <span class="material-icons">${currentTab === 'like' ? 'thumb_up' : 'thumb_down'}</span>
+                        </div>
+                        <div class="keepsave-item-info">
+                            <div class="keepsave-item-name">${escapeHTML(book.title)}</div>
+                            <div class="keepsave-item-author">${escapeHTML(book.author)}</div>
+                            ${currentTab === 'dislike' ? `<div class="keepsave-undo" data-key="${book.key}">Undo Dislike</div>` : ''}
+                        </div>
+                        <button class="keepsave-item-remove" data-key="${book.key}">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                `).join('');
+                
+                // Add click events for items
+                keepsaveList.querySelectorAll('.keepsave-item').forEach(item => {
+                    const bookKey = item.dataset.key;
+                    const book = booksList.find(b => b.key === bookKey);
+                    
+                    item.querySelector('.keepsave-item-info').addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('keepsave-undo')) {
+                            if (book && book.url) {
+                                window.open(book.url, '_blank');
+                            }
+                            closeKeepSave();
+                        }
+                    });
+                    
+                    const removeBtn = item.querySelector('.keepsave-item-remove');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (currentTab === 'like') {
+                                delete likedBooks[bookKey];
+                                localStorage.setItem('restudio_liked_books', JSON.stringify(likedBooks));
+                                // Also remove from disliked if exists
+                                delete dislikedBooks[bookKey];
+                                localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+                                showToast(`"${book.title}" removed from KeepSave`);
+                            } else {
+                                delete dislikedBooks[bookKey];
+                                localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+                                showToast(`"${book.title}" undisliked and will reappear`);
+                            }
+                            // Refresh the search results to show undisliked books
+                            const searchInput = document.getElementById('search').value.trim();
+                            if (searchInput) searchBooks();
+                            updateKeepSaveUI();
+                        });
+                    }
+                    
+                    // Undo button for disliked books
+                    const undoBtn = item.querySelector('.keepsave-undo');
+                    if (undoBtn) {
+                        undoBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const bookKey = undoBtn.dataset.key;
+                            const book = booksList.find(b => b.key === bookKey);
+                            delete dislikedBooks[bookKey];
+                            localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+                            showToast(`"${book.title}" undisliked and will reappear`);
+                            // Refresh the search results
+                            const searchInput = document.getElementById('search').value.trim();
+                            if (searchInput) searchBooks();
+                            updateKeepSaveUI();
+                        });
+                    }
+                });
+            } else {
+                keepsaveEmpty.style.display = 'flex';
+                keepsaveList.innerHTML = '';
+                keepsaveList.appendChild(keepsaveEmpty);
+                keepsaveEmpty.innerHTML = currentTab === 'like'
+                    ? `<span class="material-icons">thumb_up_off</span><p>No liked books yet</p><p style="font-size:12px;margin-top:8px;">Click Like on any book to add it here</p>`
+                    : `<span class="material-icons">thumb_down_off</span><p>No disliked books yet</p><p style="font-size:12px;margin-top:8px;">Click Dislike on any book to hide it</p>`;
+            }
+        }
+
+        function saveLikeState(bookKey, isLiked, bookData) {
+            if (isLiked) {
+                likedBooks[bookKey] = bookData;
+                delete dislikedBooks[bookKey];
+                showToast(`"${bookData.title}" liked and saved to KeepSave!`);
+            } else {
+                delete likedBooks[bookKey];
+                showToast(`Removed like from "${bookData.title}"`);
+            }
+            localStorage.setItem('restudio_liked_books', JSON.stringify(likedBooks));
+            localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+            updateKeepSaveUI();
+        }
+
+        function saveDislikeState(bookKey, isDisliked, bookData) {
+            if (isDisliked) {
+                dislikedBooks[bookKey] = bookData;
+                delete likedBooks[bookKey];
+                showToast(`"${bookData.title}" disliked - hidden from search`);
+            } else {
+                delete dislikedBooks[bookKey];
+                showToast(`Removed dislike from "${bookData.title}"`);
+            }
+            localStorage.setItem('restudio_liked_books', JSON.stringify(likedBooks));
+            localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+            updateKeepSaveUI();
+        }
+
+        function shareOnTwitter(book) {
+            const url = `https://openlibrary.org${book.key}`;
+            const tweetUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+            window.open(tweetUrl, '_blank');
+        }
+
+        function updateButtonStates(card, bookKey) {
+            const likeBtn = card.querySelector('.card-action-btn.like');
+            const dislikeBtn = card.querySelector('.card-action-btn.dislike');
+            
+            if (likedBooks[bookKey]) {
+                likeBtn.classList.add('active');
+            } else {
+                likeBtn.classList.remove('active');
+            }
+            
+            if (dislikedBooks[bookKey]) {
+                dislikeBtn.classList.add('active');
+                card.classList.add('disliked');
+            } else {
+                dislikeBtn.classList.remove('active');
+                card.classList.remove('disliked');
+            }
+        }
+
+        // KeepSave UI Functions
+        function openKeepSave() {
+            keepsaveDrawer.classList.add('open');
+            keepsaveOverlay.classList.add('active');
+            updateKeepSaveUI();
+        }
+
+        function closeKeepSave() {
+            keepsaveDrawer.classList.remove('open');
+            keepsaveOverlay.classList.remove('active');
+        }
+
+        // Tab switching
+        likeTab.addEventListener('click', () => {
+            currentTab = 'like';
+            likeTab.classList.add('active');
+            dislikeTab.classList.remove('active');
+            updateKeepSaveUI();
+        });
+        
+        dislikeTab.addEventListener('click', () => {
+            currentTab = 'dislike';
+            dislikeTab.classList.add('active');
+            likeTab.classList.remove('active');
+            updateKeepSaveUI();
+        });
+
+        keepsaveOpenBtn.addEventListener('click', openKeepSave);
+        keepsaveClose.addEventListener('click', closeKeepSave);
+        keepsaveOverlay.addEventListener('click', closeKeepSave);
+
+        keepsaveExport.addEventListener('click', () => {
+            const data = { liked: likedBooks, disliked: dislikedBooks };
+            if (Object.keys(likedBooks).length === 0 && Object.keys(dislikedBooks).length === 0) {
+                return showToast('No data to export');
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `restudio-keepsave-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('KeepSave exported!');
+        });
+
+        keepsaveClearAll.addEventListener('click', () => {
+            const count = Object.keys(likedBooks).length + Object.keys(dislikedBooks).length;
+            if (count === 0) return;
+            if (confirm(`Delete all ${count} saved items?`)) {
+                likedBooks = {};
+                dislikedBooks = {};
+                localStorage.setItem('restudio_liked_books', JSON.stringify(likedBooks));
+                localStorage.setItem('restudio_disliked_books', JSON.stringify(dislikedBooks));
+                // Refresh search results
+                const searchInput = document.getElementById('search').value.trim();
+                if (searchInput) searchBooks();
+                updateKeepSaveUI();
+                showToast('All cleared');
+            }
+        });
+
+        async function searchBooks() {
+            const query = document.getElementById("search").value.trim();
+            const container = document.getElementById("results");
+
+            if (!query) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <polygon points="15 20 15 22 14 22 14 23 10 23 10 22 9 22 9 20 15 20"/>
+                            <path d="m21,17v-1h-1v-2h-1v-6h-1v-2h-1v-1h-1v-1h-2v-1h-1V1h-2v2h-1v1h-2v1h-1v1h-1v2h-1v6h-1v2h-1v1h-1v1h1v1h18v-1h1v-1h-1Zm-7-11v3h-1v3h-2v-3h-1v-3h4Zm-3,8h2v2h-2v-2Z"/>
+                        </svg>
+                        type a keyword &amp; hit search
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '<div class="empty-state">Searching...</div>';
+
+            try {
+                const res = await fetch(
+                    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=20`
+                );
+
+                if (!res.ok) throw new Error('Network response was not ok');
+
+                const data = await res.json();
+                container.innerHTML = "";
+
+                if (!data.docs || data.docs.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <polygon points="15 20 15 22 14 22 14 23 10 23 10 22 9 22 9 20 15 20"/>
+                                <path d="m21,17v-1h-1v-2h-1v-6h-1v-2h-1v-1h-1v-1h-2v-1h-1V1h-2v2h-1v1h-2v1h-1v1h-1v2h-1v6h-1v2h-1v1h-1v1h1v1h18v-1h1v-1h-1Zm-7-11v3h-1v3h-2v-3h-1v-3h4Zm-3,8h2v2h-2v-2Z"/>
+                            </svg>
+                            No books found try another search
+                        </div>`;
+                    return;
+                }
+
+                data.docs.slice(0, 20).forEach(book => {
+                    const coverId = book.cover_i;
+                    const title = book.title || "No title";
+                    const author = book.author_name ? book.author_name[0] : "Unknown";
+                    const year = book.first_publish_year || "";
+                    const bookKey = book.key;
+                    const bookUrl = `https://openlibrary.org${bookKey}`;
+
+                    const imgSrc = coverId
+                        ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
+                        : null;
+
+                    const imageHTML = imgSrc
+                        ? `<img src="${imgSrc}" alt="${title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-image-placeholder\\'>No Cover</div>';">`
+                        : `<div class="card-image-placeholder">No Cover</div>`;
+
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    if (dislikedBooks[bookKey]) card.classList.add("disliked");
+                    
+                    card.innerHTML = `
+                        <div class="card-image-wrapper">
+                            ${imageHTML}
+                        </div>
+                        <div class="card-body">
+                            <span class="card-title" data-key="${bookKey}" data-url="${bookUrl}">${escapeHTML(title)}</span>
+                            ${year ? `<span class="card-year">${year}</span>` : ""}
+                            <span class="card-author">${escapeHTML(author)}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-action-btn like" data-key="${bookKey}" data-title="${escapeHTML(title)}" data-author="${escapeHTML(author)}" data-url="${bookUrl}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <polygon points="23 10 23 12 22 12 22 15 21 15 21 18 20 18 20 21 19 21 19 22 12 22 12 21 10 21 10 20 9 20 9 19 8 19 8 10 9 10 9 9 10 9 10 8 11 8 11 6 12 6 12 3 13 3 13 2 15 2 15 3 16 3 16 7 15 7 15 9 22 9 22 10 23 10"/>
+                                    <polygon points="6 9 6 22 2 22 2 21 1 21 1 10 2 10 2 9 6 9"/>
+                                </svg>
+                                Like
+                            </button>
+                            <button class="card-action-btn dislike" data-key="${bookKey}" data-title="${escapeHTML(title)}" data-author="${escapeHTML(author)}" data-url="${bookUrl}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <polygon points="6 2 6 15 2 15 2 14 1 14 1 3 2 3 2 2 6 2"/>
+                                    <polygon points="23 12 23 14 22 14 22 15 15 15 15 17 16 17 16 21 15 21 15 22 13 22 13 21 12 21 12 18 11 18 11 16 10 16 10 15 9 15 9 14 8 14 8 5 9 5 9 4 10 4 10 3 12 3 12 2 19 2 19 3 20 3 20 6 21 6 21 9 22 9 22 12 23 12"/>
+                                </svg>
+                                Dislike
+                            </button>
+                            <button class="card-action-btn twitter-share" data-key="${bookKey}" data-title="${escapeHTML(title)}" data-author="${escapeHTML(author)}" data-url="${bookUrl}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <rect x="22" y="5" width="1" height="1"/>
+                                    <rect x="22" y="3" width="1" height="1"/>
+                                    <polygon points="21 5 21 6 22 6 22 7 21 7 21 12 20 12 20 14 19 14 19 16 18 16 18 17 17 17 17 18 16 18 16 19 14 19 14 20 11 20 11 21 4 21 4 20 2 20 2 19 1 19 1 18 3 18 3 19 6 19 6 18 7 18 7 17 5 17 5 16 4 16 4 15 3 15 3 14 5 14 5 13 3 13 3 12 2 12 2 10 4 10 4 9 3 9 3 8 2 8 2 4 3 4 3 5 4 5 4 6 5 6 5 7 7 7 7 8 10 8 10 9 12 9 12 5 13 5 13 4 14 4 14 3 19 3 19 4 22 4 22 5 21 5"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+
+                    // Title click to open book page
+                    const titleSpan = card.querySelector('.card-title');
+                    titleSpan.addEventListener('click', () => {
+                        window.open(bookUrl, '_blank');
+                    });
+
+                    // Like button - تم التعديل هنا
+                    const likeBtn = card.querySelector('.like');
+                    likeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isLiked = !likedBooks[bookKey];
+                        // تم إرسال بيانات الكتاب مباشرة بدلاً من استخدام متغير bookData
+                        saveLikeState(bookKey, isLiked, { 
+                            key: bookKey, 
+                            title: title, 
+                            author: author, 
+                            url: bookUrl 
+                        });
+                        updateButtonStates(card, bookKey);
+                    });
+
+                    // Dislike button - تم التعديل هنا
+                    const dislikeBtn = card.querySelector('.dislike');
+                    dislikeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isDisliked = !dislikedBooks[bookKey];
+                        // تم إرسال بيانات الكتاب مباشرة بدلاً من استخدام متغير bookData
+                        saveDislikeState(bookKey, isDisliked, { 
+                            key: bookKey, 
+                            title: title, 
+                            author: author, 
+                            url: bookUrl 
+                        });
+                        updateButtonStates(card, bookKey);
+                        if (isDisliked) {
+                            card.classList.add('disliked');
+                        }
+                    });
+
+                    // Twitter share button (icon only)
+                    const twitterBtn = card.querySelector('.twitter-share');
+                    twitterBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        shareOnTwitter({ key: bookKey, title: title, author: author });
+                        showToast(`Sharing "${title}" on Twitter`);
+                    });
+
+                    updateButtonStates(card, bookKey);
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Search error:", err);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <polygon points="15 20 15 22 14 22 14 23 10 23 10 22 9 22 9 20 15 20"/>
+                            <path d="m21,17v-1h-1v-2h-1v-6h-1v-2h-1v-1h-1v-1h-2v-1h-1V1h-2v2h-1v1h-2v1h-1v1h-1v2h-1v6h-1v2h-1v1h-1v1h1v1h18v-1h1v-1h-1Zm-7-11v3h-1v3h-2v-3h-1v-3h4Zm-3,8h2v2h-2v-2Z"/>
+                        </svg>
+                        Something went wrong try again
+                    </div>`;
+            }
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Initialize KeepSave UI on load
+        updateKeepSaveUI();
+    </script>
+
+</body>
+</html>
